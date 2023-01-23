@@ -70,57 +70,6 @@ class DateLogic:
         return nextDueDate
 
     """
-    Internal method to add number of days to given due date to find next due date
-    :param givenDate : Current due date
-    :param dueDay : Day of current due date
-    :param period : number of periods
-    return nextDueDate : returns the next due day
-    """
-    def addPeriodToGivenDate(givenDate, dueDay, period):
-        computedDate = givenDate + rd.relativedelta(months=period)
-        computedDueDay = dueDay
-        if(monthrange(computedDate.year, computedDate.month)[1] < dueDay):
-            computedDueDay = monthrange(computedDate.year, computedDate.month)[1]
-        computedDate = date(computedDate.year, computedDate.month, computedDueDay)
-        return computedDate
-
-    """
-    Internal method to find next due date based on given due date but the logic is different in case of semi monthly.
-    So we are handling it as a special case
-    :param givenDate : Current due date
-    :param dueDay : Day of current due date
-    :param period : number of periods
-    return nextDueDate : returns the next due day
-    """
-    def deriveSemiMonthlyDueDate(givenDate, dueDay, period):
-        computedDate = givenDate
-        computedDueDay = 30
-        incrementor = 1
-        if(period < 0):
-            incrementor = -1
-        if(givenDate.day < 30):
-            computedDueDay = givenDate.day
-        counter = 0
-        if(givenDate.month == 2 and (givenDate+rd.relativedelta(days=1)).month > givenDate.month):
-            if(dueDay >= 30 or dueDay == 15):
-                computedDueDay = 30
-            elif(dueDay == 14):
-                computedDueDay = 29
-        while(counter != period):
-            month = 0
-            if(computedDueDay > 15):
-                computedDueDay = computedDueDay - 15
-                if(incrementor > 0):
-                    month = 1
-            else:
-                computedDueDay = computedDueDay + 15
-                if(incrementor < 0):
-                    month = -1
-            computedDate = DateLogic.addPeriodToGivenDate(computedDate, computedDueDay, month)
-            counter = counter + incrementor
-        return computedDate
-
-    """
     Find number of days between two dates based the day counting method
     :param startDate : Period start date
     :param endDate : Period end date
@@ -168,3 +117,56 @@ class DateLogic:
             daysBetween = years * 360 + months * 30 + days
 
         return daysBetween
+
+    """
+    Internal method to add number of days to given due date to find next due date
+    :param givenDate : Current due date
+    :param dueDay : Day of current due date
+    :param period : number of periods
+    return nextDueDate : returns the next due day
+    """
+    @staticmethod
+    def addPeriodToGivenDate(givenDate, dueDay, period):
+        computedDate = givenDate + rd.relativedelta(months=period)
+        computedDueDay = dueDay
+        if(monthrange(computedDate.year, computedDate.month)[1] < dueDay):
+            computedDueDay = monthrange(computedDate.year, computedDate.month)[1]
+        computedDate = date(computedDate.year, computedDate.month, computedDueDay)
+        return computedDate
+
+    """
+    Internal method to find next due date based on given due date but the logic is different in case of semi monthly.
+    So we are handling it as a special case
+    :param givenDate : Current due date
+    :param dueDay : Day of current due date
+    :param period : number of periods
+    return nextDueDate : returns the next due day
+    """
+    @staticmethod
+    def deriveSemiMonthlyDueDate(givenDate, dueDay, period):
+        computedDate = givenDate
+        computedDueDay = 30
+        incrementor = 1
+        if(period < 0):
+            incrementor = -1
+        if(givenDate.day < 30):
+            computedDueDay = givenDate.day
+        counter = 0
+        if(givenDate.month == 2 and (givenDate+rd.relativedelta(days=1)).month > givenDate.month):
+            if(dueDay >= 30 or dueDay == 15):
+                computedDueDay = 30
+            elif(dueDay == 14):
+                computedDueDay = 29
+        while(counter != period):
+            month = 0
+            if(computedDueDay > 15):
+                computedDueDay = computedDueDay - 15
+                if(incrementor > 0):
+                    month = 1
+            else:
+                computedDueDay = computedDueDay + 15
+                if(incrementor < 0):
+                    month = -1
+            computedDate = DateLogic.addPeriodToGivenDate(computedDate, computedDueDay, month)
+            counter = counter + incrementor
+        return computedDate
